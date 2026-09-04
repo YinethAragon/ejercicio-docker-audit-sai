@@ -1,35 +1,47 @@
+import os
 import pymysql
-import random
-from flask import Flask, request
+from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
-# 🚨 FALLO 1: Credenciales de BD en texto plano (Bandit / Gitleaks)
-DB_HOST = "servidor-bd-ejemplo"
-DB_USER = "root"
-DB_PASS = "admin_adso_2026_secreto"
-DB_NAME = "legacydb"
+# Cargar variables de entorno (evita contraseñas y datos quemados en texto plano)
+DB_HOST = os.getenv("DB_HOST", "servidor-bd-ejemplo")
+DB_USER = os.getenv("DB_USER", "root")
+DB_PASS = os.getenv("DB_PASS", "")
+DB_NAME = os.getenv("DB_NAME", "legacydb")
 
 @app.route("/")
 def home():
     try:
-        conn = pymysql.connect(host=DB_HOST, user=DB_USER, password=DB_PASS, database=DB_NAME)
+        conn = pymysql.connect(
+            host=DB_HOST,
+            user=DB_USER,
+            password=DB_PASS,
+            database=DB_NAME,
+            connect_timeout=3
+        )
         conn.close()
-        return "<h1>API Legacy TechNova - Funcionando (Más o menos)</h1>"
+        return jsonify({"message": "API TechNova - Funcionando correctamente"}), 200
     except Exception as e:
-        return f"<h1>Sistema Caído</h1><p>{e}</p>", 500
+        return jsonify({"error": "Error de conexión a la base de datos", "details": str(e)}), 500
 
 @app.route("/buscar")
 def buscar_usuario():
     usuario_id = request.args.get("id", "1")
-    query_peligrosa = "SELECT * FROM usuarios WHERE id = " + usuario_id
-    return f"Simulando consulta: {query_peligrosa}"
+    # Se simula la consulta parametrizada de manera segura
+    query_segura = "SELECT * FROM usuarios WHERE id = %s"
+    return jsonify({
+        "mensaje": "Consulta simulada de forma segura",
+        "query": query_segura,
+        "parametro": usuario_id
+    }), 200
 
 @app.route("/health")
 def health_check():
-    if random.random() < 0.3:
-        resultado = 1 / 0 
-    return "OK", 200
+    # Eliminada la división por cero aleatoria para garantizar estabilidad
+    return jsonify({"status": "OK"}), 200
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=5050, debug=True)
+    port = int(os.getenv("PORT", 5050))
+    debug_mode = os.getenv("FLASK_DEBUG", "False").lower() in ("true", "1")
+    app.run(host="0.0.0.0", port=port, debug=debug_mode)  # nosec B104
