@@ -4,10 +4,10 @@ from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
-# Cargar variables de entorno (evita contraseñas y datos quemados en texto plano)
-DB_HOST = os.getenv("DB_HOST", "servidor-bd-ejemplo")
+# Cargar variables de entorno
+DB_HOST = os.getenv("DB_HOST", "db")
 DB_USER = os.getenv("DB_USER", "root")
-DB_PASS = os.getenv("DB_PASS", "")
+DB_PASS = os.getenv("DB_PASS", "rootpassword")
 DB_NAME = os.getenv("DB_NAME", "legacydb")
 
 @app.route("/")
@@ -21,14 +21,13 @@ def home():
             connect_timeout=3
         )
         conn.close()
-        return jsonify({"message": "API TechNova - Funcionando correctamente"}), 200
+        return "<h1>API TechNova - Funcionando correctamente</h1>", 200
     except Exception as e:
         return jsonify({"error": "Error de conexión a la base de datos", "details": str(e)}), 500
 
 @app.route("/buscar")
 def buscar_usuario():
     usuario_id = request.args.get("id", "1")
-    # Se simula la consulta parametrizada de manera segura
     query_segura = "SELECT * FROM usuarios WHERE id = %s"
     return jsonify({
         "mensaje": "Consulta simulada de forma segura",
@@ -38,7 +37,6 @@ def buscar_usuario():
 
 @app.route("/health")
 def health_check():
-    # Eliminada la división por cero aleatoria para garantizar estabilidad
     return jsonify({"status": "OK"}), 200
 
 if __name__ == "__main__":
