@@ -43,27 +43,35 @@ jobs:
         run: |
           docker build -t api-technova:latest .
 
-      - name: 3. Escaneo de vulnerabilidades en contenedor con Trivy
-        uses: aquasecurity/trivy-action@master
-        with:
-          image-ref: 'api-technova:latest'
-          format: 'table'
-          output: 'trivy-report.txt'
-          exit-code: '0'
-          severity: 'CRITICAL,HIGH'
-
-      - name: Subir reporte de Trivy como artefacto
-        uses: actions/upload-artifact@v4
-        with:
-          name: reporte-trivy
-          path: trivy-report.txt
-
   deploy:
     needs: test-and-build
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
 
     steps:
+      - name: Clonar repositorio para escaneo
+        uses: actions/checkout@v4
+
+      - name: Construir imagen local para auditoría
+        run: |
+          docker build -t api-technova:latest .
+
+      - name: 3. Escaneo de vulnerabilidades en contenedor con Trivy (Bloqueante)
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'api-technova:latest'
+          format: 'table'
+          output: 'trivy-report.txt'
+          exit-code: '1'
+          severity: 'CRITICAL,HIGH'
+
+      - name: Subir reporte de Trivy como artefacto
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: reporte-trivy
+          path: trivy-report.txt
+
       - name: Ejecutar despliegue vía SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
