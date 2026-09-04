@@ -23,7 +23,7 @@ services:
     environment:
       DB_HOST: db
       DB_USER: user_app
-      DB_PASSWORD: userpass
+      DB_PASS: userpass
       DB_NAME: app_db
       FLASK_DEBUG: "False"
     depends_on:
