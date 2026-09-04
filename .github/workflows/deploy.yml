@@ -25,14 +25,41 @@ jobs:
           pip install -r requirements.txt
           pip install pytest bandit
 
-      - name: Ejecutar pruebas unitarias
+      - name: 1. Pruebas unitarias con Pytest
         run: |
           pytest test_app.py
 
-      - name: Auditoria de seguridad con Bandit
+      - name: 2. Auditoría de código estático con Bandit
         run: |
           bandit -r . -x ./venv || true
 
       - name: Construir imagen Docker
         run: |
           docker build -t api-technova:latest .
+
+      - name: 3. Escaneo de vulnerabilidades en contenedor con Trivy
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'api-technova:latest'
+          format: 'table'
+          exit-code: '0'
+          severity: 'CRITICAL,HIGH'
+
+  deploy:
+    needs: test-and-build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Ejecutar despliegue vía SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          port: ${{ secrets.EC2_PORT }}
+          script: |
+            cd ~/evidencia2-sena/ejercicio-docker-audit-sai || exit
+            git pull origin main
+            docker compose down
+            docker compose up -d --build
