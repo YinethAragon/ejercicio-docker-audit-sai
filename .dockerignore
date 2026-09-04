@@ -1,0 +1,11 @@
+.git
+.github
+venv
+__pycache__
+*.pyc
+.pytest_cache
+clave-docker.pem
+*.pem
+test_app.py
+docker-compose.yml
+resultado_bandit.txt
