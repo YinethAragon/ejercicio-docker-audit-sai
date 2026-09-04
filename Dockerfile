@@ -8,7 +8,8 @@ WORKDIR /app
 
 # Copiar e instalar dependencias primero para aprovechar el cache de Docker
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN python -m pip install --no-cache-dir --upgrade pip setuptools wheel \
+    && pip install --no-cache-dir -r requirements.txt
 
 # Copiar el código de la aplicación
 COPY . .
