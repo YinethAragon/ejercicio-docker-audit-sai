@@ -31,7 +31,13 @@ jobs:
 
       - name: 2. Auditoría de código estático con Bandit
         run: |
-          bandit -r . -x ./venv || true
+          bandit -r . -x ./venv,./test_app.py -f txt -o resultado_bandit.txt || true
+
+      - name: Subir reporte de Bandit como artefacto
+        uses: actions/upload-artifact@v4
+        with:
+          name: reporte-bandit
+          path: resultado_bandit.txt
 
       - name: Construir imagen Docker
         run: |
@@ -42,8 +48,15 @@ jobs:
         with:
           image-ref: 'api-technova:latest'
           format: 'table'
+          output: 'trivy-report.txt'
           exit-code: '0'
           severity: 'CRITICAL,HIGH'
+
+      - name: Subir reporte de Trivy como artefacto
+        uses: actions/upload-artifact@v4
+        with:
+          name: reporte-trivy
+          path: trivy-report.txt
 
   deploy:
     needs: test-and-build

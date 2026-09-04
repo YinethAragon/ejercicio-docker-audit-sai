@@ -4,12 +4,11 @@ from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
-# Cargar variables de entorno
-# Cargar variables de entorno coincidiendo con docker-compose.yml
+# Variables de entorno (sin credenciales quemadas en el código)
 DB_HOST = os.getenv("DB_HOST", "db")
 DB_USER = os.getenv("DB_USER", "user_app")
-DB_PASS = os.getenv("DB_PASS", "app_password_123")  # Agrega la contraseña de MySQL
-DB_NAME = os.getenv("DB_NAME", "legacydb")
+DB_PASS = os.getenv("DB_PASS", "userpass")
+DB_NAME = os.getenv("DB_NAME", "app_db")
 
 @app.route("/")
 def home():

@@ -20,4 +20,7 @@ USER appuser
 
 EXPOSE 5050
 
+HEALTHCHECK --interval=30s --timeout=5s --start-period=40s --retries=3 \
+  CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:5050/health')"
+
 CMD ["python", "app.py"]
