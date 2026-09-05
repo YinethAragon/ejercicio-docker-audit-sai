@@ -1,5 +1,5 @@
 # Usar una imagen más reciente y ligera
-FROM python:3.10-slim
+FROM python:3.10
 
 # Actualizar paquetes del sistema operativo para eliminar vulnerabilidades conocidas
 RUN apt-get update && apt-get upgrade -y && rm -rf /var/lib/apt/lists/*
