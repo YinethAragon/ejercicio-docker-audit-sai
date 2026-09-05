@@ -40,7 +40,7 @@ services:
       timeout: 5s
       retries: 5
 
-  # 3. Nginx Proxy Manager (Panel restringido a localhost por seguridad)
+   # 3. Nginx Proxy Manager (Panel restringido a localhost por seguridad)
   nginx-proxy-manager:
     image: 'jc21/nginx-proxy-manager:latest'
     container_name: nginx_proxy_manager
@@ -48,10 +48,13 @@ services:
     ports:
       - '80:80'
       - '443:443'
-      - '127.0.0.1:81:81'  # Solo accesible desde el propio servidor/localhost
+      - '127.0.0.1:81:81'
     volumes:
       - ./npm/data:/data
       - ./npm/letsencrypt:/etc/letsencrypt
+    networks:
+      - default
+      - proxy
 
   # 4. Dozzle (Sin docker.sock expuesto y puerto enlazado a localhost)
   dozzle:
