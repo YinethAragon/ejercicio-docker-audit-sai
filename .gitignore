@@ -17,3 +17,20 @@ resultado_bandit.txt
 # IDEs y editores
 .vscode/
 .idea/
+# Datos internos de Nginx Proxy Manager
+npm/data/
+npm/letsencrypt/
+# Datos sensibles de Nginx Proxy Manager
+
+npm/data/keys.json
+# Datos sensibles de Nginx Proxy Manager
+npm/data/
+
+# Metadatos de Windows
+*:Zone.Identifier
+
+# Datos de Uptime Kuma
+kuma-data/
+
+# Scripts locales de espera/verificación
+wait2.sh
