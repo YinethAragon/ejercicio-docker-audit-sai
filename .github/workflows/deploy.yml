@@ -64,6 +64,7 @@ jobs:
           output: 'trivy-report.txt'
           exit-code: '1'
           severity: 'CRITICAL,HIGH'
+          trivyignores: '.trivyignore'
 
       - name: Subir reporte de Trivy como artefacto
         if: always()
