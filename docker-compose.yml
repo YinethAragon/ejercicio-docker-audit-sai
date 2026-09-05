@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # 1. Base de datos MySQL
   db:
@@ -7,10 +5,10 @@ services:
     container_name: mysql_db
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: rootpass
-      MYSQL_DATABASE: app_db
-      MYSQL_USER: user_app
-      MYSQL_PASSWORD: userpass
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     healthcheck:
       test: ["CMD-SHELL", "mysqladmin ping -h localhost -uroot -p$$MYSQL_ROOT_PASSWORD --silent"]
       interval: 10s
@@ -29,9 +27,9 @@ services:
       - "5050:5050"
     environment:
       DB_HOST: db
-      DB_USER: user_app
-      DB_PASS: userpass
-      DB_NAME: app_db
+      DB_USER: ${MYSQL_USER}
+      DB_PASS: ${MYSQL_PASSWORD}
+      DB_NAME: ${MYSQL_DATABASE}
       FLASK_DEBUG: "False"
     depends_on:
       db:
@@ -42,38 +40,49 @@ services:
       timeout: 5s
       retries: 5
 
-  # 3. Nginx Proxy Manager (Gestor de Trafico 80, 443 y Panel 81)
+  # 3. Nginx Proxy Manager (Panel restringido a localhost por seguridad)
   nginx-proxy-manager:
     image: 'jc21/nginx-proxy-manager:latest'
     container_name: nginx_proxy_manager
     restart: unless-stopped
     ports:
       - '80:80'
-      - '81:81'
       - '443:443'
+      - '127.0.0.1:81:81'  # Solo accesible desde el propio servidor/localhost
     volumes:
       - ./npm/data:/data
       - ./npm/letsencrypt:/etc/letsencrypt
 
-  # 4. Dozzle (Visualizador de logs en tiempo real)
+  # 4. Dozzle (Sin docker.sock expuesto y puerto enlazado a localhost)
   dozzle:
     image: amir20/dozzle:latest
-    container_name: dozzle_logs
-    ports:
-      - "8888:8080"
+    restart: unless-stopped
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    restart: always
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      proxy:
+        aliases:
+          - dozzle
 
-  # 5. Uptime Kuma (Monitor de estado de servicios)
-  kuma:
-    image: louislam/uptime-kuma:1
-    container_name: uptime_kuma
-    ports:
-      - "3001:3001"
+
+  # 5. Uptime Kuma (Enlazado a localhost)
+  uptime-kuma:
+    image: louislam/uptime-kuma:latest
+    restart: unless-stopped
     volumes:
-      - ./kuma-data:/app/data
-    restart: always
+      - kuma_data:/app/data
+    networks:
+      proxy:
+        aliases:
+          - uptime-kuma
+
+networks:
+  proxy:
+    driver: bridge
+  internal:
+    driver: bridge
+
 
 volumes:
   db_data:
+  kuma_data:

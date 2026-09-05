@@ -1,6 +1,19 @@
+# Variables de entorno y credenciales (CRÍTICO)
+.env
+.env.*
+!.env.example
+*.pem
+
+# Python y entornos virtuales
 venv/
+.venv/
 __pycache__/
 *.pyc
 .pytest_cache/
-clave-docker.pem
-*.pem
+
+# Archivos de reporte generados localmente
+resultado_bandit.txt
+
+# IDEs y editores
+.vscode/
+.idea/
