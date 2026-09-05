@@ -1,4 +1,7 @@
+version: '3.8'
+
 services:
+  # 1. Base de datos MySQL
   db:
     image: mysql:8.0
     container_name: mysql_db
@@ -16,6 +19,7 @@ services:
     volumes:
       - db_data:/var/lib/mysql
 
+  # 2. Aplicacion Flask API
   web:
     build: .
     image: api-technova:v1
@@ -37,6 +41,39 @@ services:
       interval: 15s
       timeout: 5s
       retries: 5
+
+  # 3. Nginx Proxy Manager (Gestor de Trafico 80, 443 y Panel 81)
+  nginx-proxy-manager:
+    image: 'jc21/nginx-proxy-manager:latest'
+    container_name: nginx_proxy_manager
+    restart: unless-stopped
+    ports:
+      - '80:80'
+      - '81:81'
+      - '443:443'
+    volumes:
+      - ./npm/data:/data
+      - ./npm/letsencrypt:/etc/letsencrypt
+
+  # 4. Dozzle (Visualizador de logs en tiempo real)
+  dozzle:
+    image: amir20/dozzle:latest
+    container_name: dozzle_logs
+    ports:
+      - "8888:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: always
+
+  # 5. Uptime Kuma (Monitor de estado de servicios)
+  kuma:
+    image: louislam/uptime-kuma:1
+    container_name: uptime_kuma
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./kuma-data:/app/data
+    restart: always
 
 volumes:
   db_data:
