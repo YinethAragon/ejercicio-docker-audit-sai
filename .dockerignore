@@ -9,3 +9,5 @@ clave-docker.pem
 test_app.py
 docker-compose.yml
 resultado_bandit.txt
+npm
+kuma-data

@@ -1,4 +1,6 @@
-# CVEs y advisories que se ignoran en el escaneo de Trivy (un ID por línea)
+# Aval de riesgo asumido para el escaneo de Trivy (un ID por linea).
+# Vulnerabilidades de la capa base (Debian/Python) documentadas como
+# riesgo aceptado, pendientes de actualizacion del sistema operativo.
 GHSA-6v7p-g79w-8964
 CVE-2025-47273
 CVE-2025-69720
