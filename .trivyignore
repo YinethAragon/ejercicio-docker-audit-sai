@@ -1,6 +1,4 @@
-# CVEs que se ignoran en el escaneo de Trivy (un ID por línea).
-# Hallazgos del SBOM interno de la imagen base python:3.14-slim
-# (no corresponden a paquetes instalados reales del proyecto).
+# CVEs y advisories que se ignoran en el escaneo de Trivy (un ID por línea)
 GHSA-6v7p-g79w-8964
 CVE-2025-47273
 CVE-2025-69720
